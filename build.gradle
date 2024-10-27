@@ -37,47 +37,18 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // 추가된 라이브러리
+    // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
-    implementation 'com.querydsl:querydsl-jpa:5.0.0'
-    annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jpa'
-    compileOnly 'jakarta.annotation:jakarta.annotation-api'
-    compileOnly 'jakarta.persistence:jakarta.persistence-api:3.1.0'
-    annotationProcessor 'javax.persistence:javax.persistence-api:2.2'
+    // Model Mapper
     implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
+
+    // querydsl for spring boot 3.x
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-
-// QueryDSL 설정
-def querydslDir = layout.buildDirectory.dir("generated/querydsl")
-
-sourceSets {
-    main {
-        java {
-            srcDirs += querydslDir
-        }
-    }
-}
-
-tasks.withType(JavaCompile) {
-    options.annotationProcessorPath = configurations.annotationProcessor
-}
-
-tasks.register('generateQueryDSL', JavaCompile) {
-    options.annotationProcessorPath = configurations.annotationProcessor
-    source = sourceSets.main.java
-    classpath = sourceSets.main.compileClasspath
-    destinationDirectory.set(querydslDir.get().asFile)
-    options.compilerArgs = [
-            '-proc:only',
-            '-processor', 'com.querydsl.apt.jpa.JPAAnnotationProcessor'
-    ]
-}
-
-// compileJava 태스크가 QueryDSL 생성을 항상 먼저 실행하도록 설정
-tasks.named('compileJava') {
-    dependsOn(tasks.named('generateQueryDSL'))
 }

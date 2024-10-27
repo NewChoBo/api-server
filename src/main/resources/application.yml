@@ -26,6 +26,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         show_sql: true # 실행된 SQL을 콘솔에 출력합니다.
         format_sql: true # SQL을 포맷팅해서 보기 쉽게 출력합니다.
+        use_sql_comments: true
     open-in-view: false # 성능 최적화를 위해 설정합니다.
 
   h2:

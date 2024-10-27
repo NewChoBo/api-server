@@ -1,9 +1,8 @@
 server:
   port: 8080
 spring:
-  config:
-    activate:
-      on-profile: dev
+  profiles:
+    active: dev
   application:
     name: API Server Prototype
 
@@ -12,24 +11,22 @@ spring:
       name: admin
       password: admin
 
+  # DB 설정
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
-
+    url: jdbc:postgresql://<host>:<port>/<database_name> # PostgreSQL 연결 URL
+    driver-class-name: org.postgresql.Driver
+    username: <username> # PostgreSQL 사용자 이름
+    password: <password> # PostgreSQL 비밀번호
   jpa:
     hibernate:
       ddl-auto: update # 엔티티 변경 시 자동으로 테이블을 업데이트합니다.
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         show_sql: true # 실행된 SQL을 콘솔에 출력합니다.
         format_sql: true # SQL을 포맷팅해서 보기 쉽게 출력합니다.
         use_sql_comments: true
     open-in-view: false # 성능 최적화를 위해 설정합니다.
-
   h2:
     console:
-      enabled: true
-      path: /h2-console # H2 콘솔 경로 설정
+      enabled: false

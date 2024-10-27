@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,6 +19,7 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "app_user")
 public class User {
 
   @Id
@@ -26,6 +28,12 @@ public class User {
   private Long id;
 
   @Column(nullable = false, unique = true)
+  private String loginId;
+
+  @Column(nullable = false)
+  private String password;
+
+  @Column(nullable = false)
   private String username;
 
   @Column

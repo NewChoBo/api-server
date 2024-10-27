@@ -44,6 +44,7 @@ dependencies {
     compileOnly 'jakarta.annotation:jakarta.annotation-api'
     compileOnly 'jakarta.persistence:jakarta.persistence-api:3.1.0'
     annotationProcessor 'javax.persistence:javax.persistence-api:2.2'
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
 }
 
 tasks.named('test') {
@@ -72,8 +73,7 @@ tasks.register('generateQueryDSL', JavaCompile) {
     destinationDirectory.set(querydslDir.get().asFile)
     options.compilerArgs = [
             '-proc:only',
-            '-processor', 'com.querydsl.apt.jpa.JPAAnnotationProcessor',
-            '-AjpaAnnotation=jakarta.persistence.Entity'
+            '-processor', 'com.querydsl.apt.jpa.JPAAnnotationProcessor'
     ]
 }
 

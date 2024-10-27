@@ -1,12 +1,8 @@
 package jjk.api.api_server.feature.user.user.controller;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
-import jjk.api.api_server.feature.user.user.entity.User;
 import jjk.api.api_server.feature.user.user.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,46 +19,37 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
-  private final ModelMapper modelMapper;
 
-  public UserController(UserService userService, ModelMapper modelMapper) {
+  public UserController(UserService userService) {
     this.userService = userService;
-    this.modelMapper = modelMapper;
   }
 
   // 사용자 생성
   @PostMapping
   public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
-    userService.createUser(modelMapper.map(userDto, User.class));
+    userService.createUser(userDto);
     return new ResponseEntity<>(userDto, HttpStatus.OK);
   }
 
   // 모든 사용자 조회
   @GetMapping
   public ResponseEntity<List<UserDto>> getAllUsers() {
-    List<User> users = userService.getAllUsers();
-    List<UserDto> userDtos = users.stream().map(user -> modelMapper.map(user, UserDto.class))
-        .collect(Collectors.toList());
+    List<UserDto> userDtos = userService.getAllUsers();
     return new ResponseEntity<>(userDtos, HttpStatus.OK);
   }
 
   // ID로 사용자 조회
   @GetMapping("/{id}")
   public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-    Optional<User> user = userService.getUserById(id);
-    return user.map(
-            value -> new ResponseEntity<>(modelMapper.map(value, UserDto.class), HttpStatus.OK))
-        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    UserDto user = userService.getUserById(id);
+    return new ResponseEntity<>(user, HttpStatus.OK);
   }
 
   // 사용자 업데이트
   @PutMapping("/{id}")
   public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
-    User userDetails = modelMapper.map(userDto, User.class);
-    Optional<User> updatedUser = userService.updateUser(id, userDetails);
-    return updatedUser.map(
-            value -> new ResponseEntity<>(modelMapper.map(value, UserDto.class), HttpStatus.OK))
-        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    userService.updateUser(id, userDto);
+    return null;
   }
 
   // 사용자 삭제

@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ApiServerPrototypeApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ApiServerPrototypeApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(ApiServerPrototypeApplication.class, args);
+  }
 
 }

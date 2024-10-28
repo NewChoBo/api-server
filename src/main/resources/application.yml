@@ -6,6 +6,7 @@ spring:
   application:
     name: API Server Prototype
 
+  # 보안
   security:
     user:
       name: admin
@@ -30,3 +31,8 @@ spring:
   h2:
     console:
       enabled: false
+
+
+jwt:
+  secret: your_jwt_secret_key
+  expiration: 3600000

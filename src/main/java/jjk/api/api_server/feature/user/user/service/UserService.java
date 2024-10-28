@@ -77,4 +77,15 @@ public class UserService {
     // 삭제된 행이 있으면 true 반환, 없으면 false 반환
     return deletedCount > 0;
   }
+
+  public UserDto findByUsername(String loginId) {
+    User user = jpaQueryFactory.selectFrom(qUser).where(qUser.loginId.eq(loginId))
+        .fetchOne(); // 단일 사용자 조회
+
+    if (user != null) {
+      return modelMapper.map(user, UserDto.class);
+    } else {
+      return null;
+    }
+  }
 }

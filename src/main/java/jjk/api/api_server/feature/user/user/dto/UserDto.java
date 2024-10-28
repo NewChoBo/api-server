@@ -1,6 +1,7 @@
 package jjk.api.api_server.feature.user.user.dto;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +20,6 @@ public class UserDto {
   private String email;
   private LocalDateTime createdDate;
   private LocalDateTime updatedDate;
+  private Set<RoleDto> roleDto;
 
 }

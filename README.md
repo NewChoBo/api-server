@@ -1,82 +1,61 @@
-# Project Name
+# 프로젝트 이름
 
-## Description
+API 서버 - 사용자 및 역할 관리 애플리케이션
 
-This project is a Spring Boot application that manages users and roles. It includes features such as
-user authentication, role management, and secure password storage.
+## 설명
 
-## Technologies Used
+이 프로젝트는 사용자를 관리하고 역할을 관리하는 Spring Boot 애플리케이션입니다. 사용자 인증, 역할 관리 및 안전한 비밀번호 저장과 같은 기능을 포함하고 있습니다.
+
+"포트폴리오 갤러리" 프로젝트를 시작하기 전, 기본 뼈대 백엔드 프로젝트로 계획하고 있습니다.
+대부분의 페이지에서 필수적으로 많이 사용되는 기법들을 연습해볼 생각입니다.
+
+## 사용 기술
 
 - Java
 - Spring Boot
+- Swagger
 - Spring Security
 - Spring Data JPA
+- QueryDSL
 - Gradle
+- JWT
 
-## Getting Started
+## 시작하기
 
-### Prerequisites
+### 필수 조건
 
-- Java 17 or higher
-- Gradle 7.5 or higher
+- Java 17 이상
+- Gradle 7.5 이상
 
-### Installation
+### 설치
 
-1. Clone the repository:
+1. 저장소를 클론합니다:
     ```sh
-    git clone https://github.com/your-username/your-repo.git
+    git clone https://github.com/NewChoBo/api-server.git
     ```
-2. Navigate to the project directory:
+2. 프로젝트 디렉토리로 이동합니다:
     ```sh
-    cd your-repo
+    cd api-server
     ```
-3. Build the project:
+3. 프로젝트를 빌드합니다:
     ```sh
     ./gradlew build
     ```
 
-### Running the Application
+### 애플리케이션 실행
 
-1. Run the application:
+1. 애플리케이션을 실행합니다:
     ```sh
     ./gradlew bootRun
     ```
-2. The application will be available at `http://localhost:8080`.
+2. 애플리케이션은 `http://localhost:8080`에서 사용할 수 있습니다.
 
-## API Endpoints
+## API 엔드포인트
 
-### Authentication
+이 프로젝트의 API 엔드포인트에 대한 자세한 내용은 Swagger 문서를 참조하십시오.
 
-- **POST /api/auth/signin**: Sign in with username and password.
+Swagger 페이지 주소는 다음과 같습니다: [Swagger UI](http://localhost:8080/swagger-ui/index.html)
 
-### User Management
+## 보안
 
-- **GET /api/users**: Retrieve all users.
-- **POST /api/users**: Create a new user.
-- **GET /api/users/{id}**: Retrieve a user by ID.
-- **PUT /api/users/{id}**: Update a user by ID.
-- **DELETE /api/users/{id}**: Delete a user by ID.
-
-### Role Management
-
-- **GET /api/roles**: Retrieve all roles.
-- **POST /api/roles**: Create a new role.
-- **GET /api/roles/{id}**: Retrieve a role by ID.
-- **PUT /api/roles/{id}**: Update a role by ID.
-- **DELETE /api/roles/{id}**: Delete a role by ID.
-
-## Security
-
-Passwords are securely hashed using `BCryptPasswordEncoder` before being stored in the database.
-
-## Contributing
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature-branch`).
-3. Commit your changes (`git commit -m 'Add some feature'`).
-4. Push to the branch (`git push origin feature-branch`).
-5. Open a pull request.
-
-## License
-
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+비밀번호는 데이터베이스에 저장되기 전에 `BCryptPasswordEncoder`를 사용하여 안전하게 해싱됩니다.

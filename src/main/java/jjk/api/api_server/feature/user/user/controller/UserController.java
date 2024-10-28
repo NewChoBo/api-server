@@ -1,6 +1,7 @@
 package jjk.api.api_server.feature.user.user.controller;
 
 import java.util.List;
+import java.util.Optional;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -40,8 +41,8 @@ public class UserController {
 
   // ID로 사용자 조회
   @GetMapping("/{id}")
-  public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
-    UserDto user = userService.getUserById(id);
+  public ResponseEntity<Optional<UserDto>> getUserById(@PathVariable Long id) {
+    Optional<UserDto> user = userService.getUserById(id);
     return new ResponseEntity<>(user, HttpStatus.OK);
   }
 

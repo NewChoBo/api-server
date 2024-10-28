@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import jjk.api.api_server.common.util.PasswordUtil;
 import jjk.api.api_server.feature.user.auth.repository.RoleRepository;
 import jjk.api.api_server.feature.user.user.entity.Role;
 import jjk.api.api_server.feature.user.user.entity.User;
@@ -32,10 +33,12 @@ public class DatabaseInitializer {
   }
 
   private void initUserAndRole() {
+    String encodedPassword = PasswordUtil.encodePassword("password");
+
     User user1 = User.builder()
         .loginId("user1")
         .username("user name1")
-        .password("password1")
+        .password(encodedPassword)
         .email("abcd@efg.com")
         .createdDate(LocalDateTime.now())
         .updatedDate(LocalDateTime.now())
@@ -45,7 +48,7 @@ public class DatabaseInitializer {
     User user2 = User.builder()
         .loginId("user2")
         .username("user name2")
-        .password("password2")
+        .password(encodedPassword)
         .email("abcd2@efg.com")
         .createdDate(LocalDateTime.now())
         .updatedDate(LocalDateTime.now())

@@ -1,5 +1,6 @@
 package jjk.api.api_server.feature.user.auth.service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import jjk.api.api_server.feature.user.auth.model.CustomUserDetails;
@@ -23,11 +24,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    UserDto userDto = userService.findByUsername(username);
+    Optional<UserDto> optionalUserDto = userService.findByUsername(username);
 
-    if (userDto == null) {
+    if (optionalUserDto.isEmpty()) {
       throw new UsernameNotFoundException("User not found");
     }
+
+    UserDto userDto = optionalUserDto.get();
 
     Set<GrantedAuthority> grantedAuthorities = getAuthByRoles(userDto.getRoleDto());
     return new CustomUserDetails(userDto.getUsername(), userDto.getPassword(), grantedAuthorities);

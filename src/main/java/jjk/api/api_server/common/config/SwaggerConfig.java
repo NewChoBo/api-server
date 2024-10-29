@@ -15,7 +15,8 @@ public class SwaggerConfig {
   @Bean
   public OpenAPI customOpenAPI() {
     return new OpenAPI().info(
-            new Info().title("API Server").version("1.0").description("API Server Description"))
+            new Info().title("New Chobo's API Server").version("1.0")
+                .description("범용적인 프로젝트 작성을 위한 백엔드 뼈대 프로젝트입니다."))
         .addSecurityItem(new SecurityRequirement().addList("bearerAuth")).components(
             new io.swagger.v3.oas.models.Components().addSecuritySchemes("bearerAuth",
                 new SecurityScheme().type(Type.HTTP).scheme("bearer").bearerFormat("JWT")

@@ -47,6 +47,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         // SecurityContext에 인증 정보 설정
         log.info("User '{}' authenticated", username);
+        log.info("role: {}", role);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
       }
     } else {

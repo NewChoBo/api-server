@@ -12,6 +12,7 @@ import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping("/api/users")
 @Tag(name = "User Management", description = "Operations pertaining to user management")
 public class UserController {
@@ -34,6 +36,7 @@ public class UserController {
 
   // 사용자 생성
   @PostMapping
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @Operation(summary = "Create a new user", description = "Creates a new user with the provided details")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Successfully created user", content = @Content(schema = @Schema(implementation = UserDto.class))),
@@ -46,6 +49,7 @@ public class UserController {
 
   // 모든 사용자 조회
   @GetMapping
+  @PreAuthorize("hasRole('ROLE_USER')")
   @Operation(summary = "Get all users", description = "Retrieves a list of all users")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Successfully retrieved list", content = @Content(schema = @Schema(implementation = List.class))),

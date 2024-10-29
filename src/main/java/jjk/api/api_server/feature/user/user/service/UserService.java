@@ -9,6 +9,7 @@ import jjk.api.api_server.feature.user.user.dto.RoleDto;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.entity.QRole;
 import jjk.api.api_server.feature.user.user.entity.QUser;
+import jjk.api.api_server.feature.user.user.entity.Role;
 import jjk.api.api_server.feature.user.user.entity.User;
 import jjk.api.api_server.feature.user.user.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -90,9 +91,13 @@ public class UserService {
   public UserDto userToDto(User user) {
     UserDto userDto = modelMapper.map(user, UserDto.class);
     if (user.getRoles() != null) {
-      userDto.setRoleDto(user.getRoles().stream().map(role -> modelMapper.map(role, RoleDto.class))
+      userDto.setRoleDto(user.getRoles().stream().map(this::roleToDto)
           .collect(Collectors.toSet()));
     }
     return userDto;
+  }
+
+  public RoleDto roleToDto(Role role) {
+    return modelMapper.map(role, RoleDto.class);
   }
 }

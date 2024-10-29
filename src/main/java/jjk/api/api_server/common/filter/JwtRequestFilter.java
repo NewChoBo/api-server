@@ -7,6 +7,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import jjk.api.api_server.common.util.JwtUtil;
 import jjk.api.api_server.feature.user.auth.service.CustomUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,8 +29,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-      FilterChain chain)
-      throws ServletException, IOException {
+      FilterChain chain) throws ServletException, IOException {
     final String authorizationHeader = request.getHeader("Authorization");
 
     String username = null;
@@ -45,8 +46,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
             userDetails, null, userDetails.getAuthorities());
-        usernamePasswordAuthenticationToken
-            .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        usernamePasswordAuthenticationToken.setDetails(
+            new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
       }
     }

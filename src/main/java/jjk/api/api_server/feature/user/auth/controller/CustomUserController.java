@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class CustomUserController {
 
-  private static final Logger logger = LoggerFactory.getLogger(CustomUserController.class);
+  private static final Logger log = LoggerFactory.getLogger(CustomUserController.class);
 
   private final AuthenticationManager authenticationManager;
   private final CustomUserDetailsService userService;
@@ -39,7 +39,7 @@ public class CustomUserController {
           new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword())
       );
     } catch (AuthenticationException e) {
-      logger.error("Invalid username or password", e);
+      log.error("Invalid username or password", e);
       return ResponseEntity.status(401).body("Invalid username or password");
     }
 

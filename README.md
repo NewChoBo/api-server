@@ -59,3 +59,14 @@ Swagger 페이지 주소는 다음과 같습니다: [Swagger UI](http://localhos
 ## 보안
 
 비밀번호는 데이터베이스에 저장되기 전에 `BCryptPasswordEncoder`를 사용하여 안전하게 해싱됩니다.
+
+### 예제 프로젝트 swagger 위치
+
+도메인: newchobo.duckdns.org
+
+## 잡설
+
+- 이 프로젝트는 개인적인 공부를 위한 프로젝트입니다.
+- 추후에 타 프로젝트를 진행할 때, 이 프로젝트를 fork 해서 사용할 수 있는 범용적인 프로젝트를 목표로 하고 있습니다.
+- 채팅 서비스/NoSQL 활용 목적으로 Firebase의 Firestore를 사용을 고려중입니다.
+- OAuth 인증의 경우는 욕심은 있으나, 아직 사용할 가능성은 낮긴 합니다.

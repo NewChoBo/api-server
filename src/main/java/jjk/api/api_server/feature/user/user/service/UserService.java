@@ -1,16 +1,20 @@
 package jjk.api.api_server.feature.user.user.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import jjk.api.api_server.feature.user.user.dto.RoleDto;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
+import jjk.api.api_server.feature.user.user.entity.QRole;
 import jjk.api.api_server.feature.user.user.entity.QUser;
+import jjk.api.api_server.feature.user.user.entity.Role;
 import jjk.api.api_server.feature.user.user.entity.User;
 import jjk.api.api_server.feature.user.user.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
@@ -20,7 +24,8 @@ public class UserService {
   private final JPAQueryFactory jpaQueryFactory;
 
   // QEntity
-  private static final QUser qUser = QUser.user; // QUser를 클래스 필드로 선언
+  private static final QUser qUser = QUser.user;
+  private static final QRole qRole = QRole.role;
 
 
   public UserService(UserRepository userRepository, ModelMapper modelMapper,
@@ -42,14 +47,9 @@ public class UserService {
   }
 
   // ID로 사용자 조회
-  public UserDto getUserById(Long id) {
-    User user = jpaQueryFactory.selectFrom(qUser).where(qUser.id.eq(id)).fetchOne(); // 단일 사용자 조회
-
-    if (user != null) {
-      return modelMapper.map(user, UserDto.class);
-    } else {
-      return null;
-    }
+  public Optional<UserDto> getUserById(Long id) {
+    User user = jpaQueryFactory.selectFrom(qUser).where(qUser.id.eq(id)).fetchOne();
+    return Optional.ofNullable(user).map(this::userToDto);
   }
 
   // 사용자 업데이트
@@ -78,14 +78,26 @@ public class UserService {
     return deletedCount > 0;
   }
 
-  public UserDto findByUsername(String loginId) {
-    User user = jpaQueryFactory.selectFrom(qUser).where(qUser.loginId.eq(loginId))
-        .fetchOne(); // 단일 사용자 조회
+  @Transactional(readOnly = true)
+  public Optional<UserDto> findByUsername(String loginId) {
+    User user = jpaQueryFactory.selectFrom(qUser)
+        .leftJoin(qUser.roles, qRole)
+        .where(qUser.loginId.eq(loginId))
+        .fetchOne();
 
-    if (user != null) {
-      return modelMapper.map(user, UserDto.class);
-    } else {
-      return null;
+    return Optional.ofNullable(user).map(this::userToDto);
+  }
+
+  public UserDto userToDto(User user) {
+    UserDto userDto = modelMapper.map(user, UserDto.class);
+    if (user.getRoles() != null) {
+      userDto.setRoleDto(user.getRoles().stream().map(this::roleToDto)
+          .collect(Collectors.toSet()));
     }
+    return userDto;
+  }
+
+  public RoleDto roleToDto(Role role) {
+    return modelMapper.map(role, RoleDto.class);
   }
 }

@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.function.Function;
 import jjk.api.api_server.feature.user.auth.model.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,6 +28,10 @@ public class JwtUtil {
   public String generateToken(CustomUserDetails user) {
     return Jwts.builder()
         .setSubject(user.getUsername())
+        .claim("role", user.getAuthorities().stream()
+            .findFirst()
+            .map(GrantedAuthority::getAuthority)
+            .orElse(""))
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + expiration))
         .signWith(getSigningKey(), SignatureAlgorithm.HS512)
@@ -50,12 +55,22 @@ public class JwtUtil {
         .getBody();
   }
 
-  public boolean validateToken(String token, String username) {
-    final String extractedUsername = extractUsername(token);
-    return (extractedUsername.equals(username) && !isTokenExpired(token));
+  public boolean validateToken(String token) {
+    try {
+      // 토큰을 파싱하여 서명 검증을 수행하고 클레임을 추출
+      Claims claims = extractAllClaims(token);
+      return !isTokenExpired(claims);
+    } catch (Exception e) {
+      // 토큰이 유효하지 않거나 서명 검증에 실패한 경우 false 반환
+      return false;
+    }
   }
 
-  private boolean isTokenExpired(String token) {
-    return extractClaim(token, Claims::getExpiration).before(new Date());
+  private boolean isTokenExpired(Claims claims) {
+    return claims.getExpiration().before(new Date());
+  }
+
+  public String extractRole(String token) {
+    return extractClaim(token, claims -> claims.get("role", String.class));
   }
 }

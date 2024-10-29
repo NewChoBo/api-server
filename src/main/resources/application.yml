@@ -23,7 +23,6 @@ spring:
       ddl-auto: update # 엔티티 변경 시 자동으로 테이블을 업데이트합니다.
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         show_sql: true # 실행된 SQL을 콘솔에 출력합니다.
         format_sql: true # SQL을 포맷팅해서 보기 쉽게 출력합니다.
         use_sql_comments: true

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@PreAuthorize("hasRole('ROLE_ADMIN')")
+@PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping("/api/users")
 @Tag(name = "User Management", description = "Operations pertaining to user management")
 public class UserController {
@@ -34,16 +34,20 @@ public class UserController {
     this.userService = userService;
   }
 
+  // 사용자 생성
   @PostMapping
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @Operation(summary = "Create a new user", description = "Creates a new user with the provided details")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Successfully created user", content = @Content(schema = @Schema(implementation = UserDto.class))),
-      @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)})
+      @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content)
+  })
   public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
     userService.createUser(userDto);
     return new ResponseEntity<>(userDto, HttpStatus.OK);
   }
 
+  // 모든 사용자 조회
   @GetMapping
   @PreAuthorize("hasRole('ROLE_USER')")
   @Operation(summary = "Get all users", description = "Retrieves a list of all users")
@@ -51,37 +55,44 @@ public class UserController {
       @ApiResponse(responseCode = "200", description = "Successfully retrieved list", content = @Content(schema = @Schema(implementation = List.class))),
       @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
       @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
-      @ApiResponse(responseCode = "404", description = "Not found", content = @Content)})
+      @ApiResponse(responseCode = "404", description = "Not found", content = @Content)
+  })
   public ResponseEntity<List<UserDto>> getAllUsers() {
     List<UserDto> userDtos = userService.getAllUsers();
     return new ResponseEntity<>(userDtos, HttpStatus.OK);
   }
 
+  // ID로 사용자 조회
   @GetMapping("/{id}")
   @Operation(summary = "Get user by ID", description = "Retrieves a user by their ID")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Successfully retrieved user", content = @Content(schema = @Schema(implementation = UserDto.class))),
-      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
   public ResponseEntity<Optional<UserDto>> getUserById(@PathVariable Long id) {
     Optional<UserDto> user = userService.getUserById(id);
     return new ResponseEntity<>(user, HttpStatus.OK);
   }
 
+  // 사용자 업데이트
   @PutMapping("/{id}")
   @Operation(summary = "Update an existing user", description = "Updates an existing user with the provided details")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Successfully updated user", content = @Content(schema = @Schema(implementation = UserDto.class))),
-      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
   public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
     userService.updateUser(id, userDto);
-    return new ResponseEntity<>(userDto, HttpStatus.OK);
+    return null;
   }
 
+  // 사용자 삭제
   @DeleteMapping("/{id}")
   @Operation(summary = "Delete a user", description = "Deletes a user by their ID")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "Successfully deleted user", content = @Content),
-      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)})
+      @ApiResponse(responseCode = "404", description = "User not found", content = @Content)
+  })
   public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
     boolean isDeleted = userService.deleteUser(id);
     return isDeleted ? new ResponseEntity<>(HttpStatus.NO_CONTENT)

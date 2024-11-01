@@ -31,4 +31,9 @@ public class AuthController {
     public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto) {
         return authService.signUp(signUpDto);
     }
+
+    @PostMapping("/signout")
+    public ResponseEntity<String> signOut() {
+        return authService.signOut();
+    }
 }

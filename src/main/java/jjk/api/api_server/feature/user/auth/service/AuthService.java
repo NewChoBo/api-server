@@ -68,4 +68,9 @@ public class AuthService {
         }
         return ResponseEntity.ok("Signed up successfully");
     }
+
+    public ResponseEntity<String> signOut() {
+        // TODO: token 만료 처리 필요
+        return ResponseEntity.ok("Signed out successfully");
+    }
 }

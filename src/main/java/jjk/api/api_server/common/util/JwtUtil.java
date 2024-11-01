@@ -66,8 +66,8 @@ public class JwtUtil {
     return extractClaim(token, claims -> {
       List<?> roles = claims.get("roles", List.class);
       return roles.stream()
-          .filter(role -> role instanceof String)
-          .map(role -> (String) role)
+          .filter(String.class::isInstance)
+          .map(String.class::cast)
           .toList();
     });
   }

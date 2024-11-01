@@ -46,8 +46,8 @@ public class DatabaseInitializer {
         .build();
     userRepository.save(admin);
     User user = User.builder()
-        .loginId("user2")
-        .username("user name2")
+        .loginId("user")
+        .username("일반 이용자")
         .password(encodedPassword)
         .email("abcd2@efg.com")
         .createdDate(LocalDateTime.now())

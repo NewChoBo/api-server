@@ -15,24 +15,24 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Authentications", description = "가입 및 로그인/아웃 기능")
 public class AuthController {
 
-    private final AuthService authService;
+  private final AuthService authService;
 
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
+  public AuthController(AuthService authService) {
+    this.authService = authService;
+  }
 
-    @PostMapping("/signin")
-    public ResponseEntity<String> signIn(@RequestBody SignInDto signInDto) {
-        return authService.signIn(signInDto);
-    }
+  @PostMapping("/signin")
+  public ResponseEntity<String> signIn(@RequestBody SignInDto signInDto) {
+    return authService.signIn(signInDto);
+  }
 
-    @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto) {
-        return authService.signUp(signUpDto);
-    }
+  @PostMapping("/signup")
+  public ResponseEntity<String> signUp(@RequestBody SignUpDto signUpDto) {
+    return authService.signUp(signUpDto);
+  }
 
-    @PostMapping("/signout")
-    public ResponseEntity<String> signOut() {
-        return authService.signOut();
-    }
+  @PostMapping("/signout")
+  public ResponseEntity<String> signOut() {
+    return authService.signOut();
+  }
 }

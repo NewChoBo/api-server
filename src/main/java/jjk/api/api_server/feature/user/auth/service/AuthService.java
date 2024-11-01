@@ -20,57 +20,61 @@ import java.time.LocalDateTime;
 @Slf4j
 @Service
 public class AuthService {
-    private final UserRepository userRepository;
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService customUserDetailsService;
-    private final PasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
 
-    public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CustomUserDetailsService customUserDetailsService,
-                       UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtil = jwtUtil;
-        this.customUserDetailsService = customUserDetailsService;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+  private final AuthenticationManager authenticationManager;
+  private final JwtUtil jwtUtil;
+  private final CustomUserDetailsService customUserDetailsService;
+  private final PasswordEncoder passwordEncoder;
+
+  public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil,
+      CustomUserDetailsService customUserDetailsService,
+      UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    this.authenticationManager = authenticationManager;
+    this.jwtUtil = jwtUtil;
+    this.customUserDetailsService = customUserDetailsService;
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
+
+  @Transactional(readOnly = true)
+  public ResponseEntity<String> signIn(SignInDto signInDto) {
+    try {
+      authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(signInDto.getLoginId(), signInDto.getPassword()));
+    } catch (AuthenticationException e) {
+      log.error("Invalid username or password", e);
+      return ResponseEntity.status(401).body("Invalid username or password");
     }
+    final CustomUserDetails userDetails = customUserDetailsService.loadUserByUsername(
+        signInDto.getLoginId());
+    final String jwt = jwtUtil.generateToken(userDetails);
 
-    @Transactional(readOnly = true)
-    public ResponseEntity<String> signIn(SignInDto signInDto) {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInDto.getLoginId(), signInDto.getPassword()));
-        } catch (AuthenticationException e) {
-            log.error("Invalid username or password", e);
-            return ResponseEntity.status(401).body("Invalid username or password");
-        }
-        final CustomUserDetails userDetails = customUserDetailsService.loadUserByUsername(signInDto.getLoginId());
-        final String jwt = jwtUtil.generateToken(userDetails);
+    return ResponseEntity.ok(jwt);
+  }
 
-        return ResponseEntity.ok(jwt);
+  @Transactional
+  public ResponseEntity<String> signUp(SignUpDto signUpDto) {
+    try {
+      User user = User.builder()
+          .username(signUpDto.getUsername())
+          .loginId(signUpDto.getLoginId())
+          .password(passwordEncoder.encode(signUpDto.getPassword()))
+          .email(signUpDto.getEmail())
+          .createdDate(LocalDateTime.now())
+          .build();
+      userRepository.save(user);
+      userRepository.flush();
+    } catch (Exception e) {
+      log.error("Failed to sign up", e);
+      return ResponseEntity.status(500).body("Failed to sign up");
     }
+    return ResponseEntity.ok("Signed up successfully");
+  }
 
-    @Transactional
-    public ResponseEntity<String> signUp(SignUpDto signUpDto) {
-        try {
-            User user = User.builder()
-                    .username(signUpDto.getUsername())
-                    .loginId(signUpDto.getLoginId())
-                    .password(passwordEncoder.encode(signUpDto.getPassword()))
-                    .email(signUpDto.getEmail())
-                    .createdDate(LocalDateTime.now())
-                    .build();
-            userRepository.save(user);
-            userRepository.flush();
-        } catch (Exception e) {
-            log.error("Failed to sign up", e);
-            return ResponseEntity.status(500).body("Failed to sign up");
-        }
-        return ResponseEntity.ok("Signed up successfully");
-    }
-
-    public ResponseEntity<String> signOut() {
-        // TODO: token 만료 처리 필요
-        return ResponseEntity.ok("Signed out successfully");
-    }
+  public ResponseEntity<String> signOut() {
+    // TODO: token 만료 처리 필요
+    return ResponseEntity.ok("Signed out successfully");
+  }
 }

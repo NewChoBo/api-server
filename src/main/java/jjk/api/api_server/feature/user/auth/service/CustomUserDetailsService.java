@@ -32,7 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     UserDto userDto = optionalUserDto.get();
 
-    Set<GrantedAuthority> grantedAuthorities = getAuthByRoles(userDto.getRoleDto());
+    Set<GrantedAuthority> grantedAuthorities = getAuthByRoles(userDto.getRoles());
     return new CustomUserDetails(userDto.getLoginId(), userDto.getPassword(), grantedAuthorities);
   }
 

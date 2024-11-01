@@ -93,7 +93,7 @@ public class UserService {
                 roleDtoSet.add(roleToDto(role));
             }
         }
-        userDto.setRoleDto(roleDtoSet);
+        userDto.setRoles(roleDtoSet);
         return userDto;
     }
 

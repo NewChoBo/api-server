@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping("/api/users")
-@Tag(name = "User Management", description = "Operations pertaining to user management")
+@Tag(name = "User Management", description = "사용자 정보 관리가 가능 API")
 public class UserController {
 
   private final UserService userService;

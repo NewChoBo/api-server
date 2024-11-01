@@ -4,20 +4,18 @@ import jjk.api.api_server.common.util.JwtUtil;
 import jjk.api.api_server.feature.user.auth.dto.SignInDto;
 import jjk.api.api_server.feature.user.auth.dto.SignUpDto;
 import jjk.api.api_server.feature.user.auth.model.CustomUserDetails;
-import jjk.api.api_server.feature.user.user.entity.Role;
 import jjk.api.api_server.feature.user.user.entity.User;
 import jjk.api.api_server.feature.user.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Set;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -27,15 +25,15 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService customUserDetailsService;
-    private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CustomUserDetailsService customUserDetailsService, ModelMapper modelMapper,
-                       UserRepository userRepository) {
+    public AuthService(AuthenticationManager authenticationManager, JwtUtil jwtUtil, CustomUserDetailsService customUserDetailsService,
+                       UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
         this.customUserDetailsService = customUserDetailsService;
-        this.modelMapper = modelMapper;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -55,8 +53,15 @@ public class AuthService {
     @Transactional
     public ResponseEntity<String> signUp(SignUpDto signUpDto) {
         try {
-            User user = modelMapper.map(signUpDto, User.class);
+            User user = User.builder()
+                    .username(signUpDto.getUsername())
+                    .loginId(signUpDto.getLoginId())
+                    .password(passwordEncoder.encode(signUpDto.getPassword()))
+                    .email(signUpDto.getEmail())
+                    .createdDate(LocalDateTime.now())
+                    .build();
             userRepository.save(user);
+            userRepository.flush();
         } catch (Exception e) {
             log.error("Failed to sign up", e);
             return ResponseEntity.status(500).body("Failed to sign up");

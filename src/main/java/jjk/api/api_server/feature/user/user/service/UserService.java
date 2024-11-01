@@ -41,14 +41,14 @@ public class UserService {
   public List<UserDto> getAllUsers() {
     List<User> users = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin()
         .fetch();
-    return users.stream().map((element) -> modelMapper.map(element, UserDto.class)).toList();
+    return users.stream().map(element -> modelMapper.map(element, UserDto.class)).toList();
   }
 
   // ID로 사용자 조회
   public Optional<UserDto> getUserById(Long id) {
     User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin()
         .where(qUser.id.eq(id)).fetchOne();
-    return Optional.ofNullable(user).map((element) -> modelMapper.map(element, UserDto.class));
+    return Optional.ofNullable(user).map(element -> modelMapper.map(element, UserDto.class));
   }
 
   // 사용자 업데이트
@@ -75,12 +75,5 @@ public class UserService {
 
     // 삭제된 행이 있으면 true 반환, 없으면 false 반환
     return deletedCount > 0;
-  }
-
-  @Transactional(readOnly = true)
-  public Optional<UserDto> findByUsername(String loginId) {
-    User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole)
-        .where(qUser.loginId.eq(loginId)).fetchOne();
-    return Optional.ofNullable(user).map((element) -> modelMapper.map(element, UserDto.class));
   }
 }

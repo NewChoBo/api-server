@@ -4,6 +4,7 @@ import jjk.api.api_server.common.filter.JwtRequestFilter;
 import jjk.api.api_server.feature.user.auth.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -24,7 +25,7 @@ public class SecurityConfig {
   private final CustomUserDetailsService customUserDetailsService;
   private final JwtRequestFilter jwtRequestFilter;
 
-  public SecurityConfig(CustomUserDetailsService customUserDetailsService,
+  public SecurityConfig(@Lazy CustomUserDetailsService customUserDetailsService,
       JwtRequestFilter jwtRequestFilter) {
     this.customUserDetailsService = customUserDetailsService;
     this.jwtRequestFilter = jwtRequestFilter;

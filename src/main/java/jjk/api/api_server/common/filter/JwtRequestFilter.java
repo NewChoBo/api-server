@@ -5,7 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
+import java.util.List;
 import jjk.api.api_server.common.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +29,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
   }
 
   @Override
-  protected void doFilterInternal(HttpServletRequest request,
-      @NonNull HttpServletResponse response,
+  protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response,
       @NonNull FilterChain chain) throws ServletException, IOException {
     final String authorizationHeader = request.getHeader("Authorization");
 
@@ -40,16 +39,20 @@ public class JwtRequestFilter extends OncePerRequestFilter {
       if (jwtUtil.validateToken(jwt)) {
         // 토큰에서 사용자 이름 및 권한 정보 가져오기
         String username = jwtUtil.extractUsername(jwt); // 사용자 이름 추출
-        String role = jwtUtil.extractRole(jwt); // 권한 추출
+        List<String> roles = jwtUtil.extractRoles(jwt); // 권한 추출
+
+        // 권한 정보를 포함한 인증 객체 생성
+        List<SimpleGrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new)
+            .toList();
 
         // 권한 정보를 포함한 인증 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            username, null, Collections.singletonList(new SimpleGrantedAuthority(role)));
+            username, null, authorities);
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         // SecurityContext에 인증 정보 설정
         log.info("User '{}' authenticated", username);
-        log.info("role: {}", role);
+        log.info("role: {}", roles);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
       }
     } else {

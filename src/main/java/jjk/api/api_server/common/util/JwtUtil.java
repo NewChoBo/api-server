@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 import jjk.api.api_server.feature.user.auth.model.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,16 +27,10 @@ public class JwtUtil {
   }
 
   public String generateToken(CustomUserDetails user) {
-    return Jwts.builder()
-        .setSubject(user.getUsername())
-        .claim("role", user.getAuthorities().stream()
-            .findFirst()
-            .map(GrantedAuthority::getAuthority)
-            .orElse(""))
-        .setIssuedAt(new Date())
-        .setExpiration(new Date(System.currentTimeMillis() + expiration))
-        .signWith(getSigningKey(), SignatureAlgorithm.HS512)
-        .compact();
+    return Jwts.builder().setSubject(user.getUsername())
+        .claim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+        .setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + expiration))
+        .signWith(getSigningKey(), SignatureAlgorithm.HS512).compact();
   }
 
   public String extractUsername(String token) {
@@ -48,10 +43,7 @@ public class JwtUtil {
   }
 
   private Claims extractAllClaims(String token) {
-    return Jwts.parserBuilder()
-        .setSigningKey(getSigningKey())
-        .build()
-        .parseClaimsJws(token)
+    return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token)
         .getBody();
   }
 
@@ -70,7 +62,13 @@ public class JwtUtil {
     return claims.getExpiration().before(new Date());
   }
 
-  public String extractRole(String token) {
-    return extractClaim(token, claims -> claims.get("role", String.class));
+  public List<String> extractRoles(String token) {
+    return extractClaim(token, claims -> {
+      List<?> roles = claims.get("roles", List.class);
+      return roles.stream()
+          .filter(role -> role instanceof String)
+          .map(role -> (String) role)
+          .toList();
+    });
   }
 }

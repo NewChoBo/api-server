@@ -1,18 +1,12 @@
 package jjk.api.api_server.feature.user.user.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-
-import jjk.api.api_server.feature.user.user.dto.RoleDto;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.entity.QRole;
 import jjk.api.api_server.feature.user.user.entity.QUser;
-import jjk.api.api_server.feature.user.user.entity.Role;
 import jjk.api.api_server.feature.user.user.entity.User;
 import jjk.api.api_server.feature.user.user.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -47,14 +41,14 @@ public class UserService {
   public List<UserDto> getAllUsers() {
     List<User> users = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin()
         .fetch();
-    return users.stream().map(this::userToDto).toList();
+    return users.stream().map((element) -> modelMapper.map(element, UserDto.class)).toList();
   }
 
   // ID로 사용자 조회
   public Optional<UserDto> getUserById(Long id) {
     User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin()
         .where(qUser.id.eq(id)).fetchOne();
-    return Optional.ofNullable(user).map(this::userToDto);
+    return Optional.ofNullable(user).map((element) -> modelMapper.map(element, UserDto.class));
   }
 
   // 사용자 업데이트
@@ -87,23 +81,6 @@ public class UserService {
   public Optional<UserDto> findByUsername(String loginId) {
     User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole)
         .where(qUser.loginId.eq(loginId)).fetchOne();
-
-    return Optional.ofNullable(user).map(this::userToDto);
-  }
-
-  public UserDto userToDto(User user) {
-    UserDto userDto = modelMapper.map(user, UserDto.class);
-    Set<RoleDto> roleDtoSet = new HashSet<>();
-    if (user.getRoles() != null) {
-      for (Role role : user.getRoles()) {
-        roleDtoSet.add(roleToDto(role));
-      }
-    }
-    userDto.setRoles(roleDtoSet);
-    return userDto;
-  }
-
-  public RoleDto roleToDto(Role role) {
-    return modelMapper.map(role, RoleDto.class);
+    return Optional.ofNullable(user).map((element) -> modelMapper.map(element, UserDto.class));
   }
 }

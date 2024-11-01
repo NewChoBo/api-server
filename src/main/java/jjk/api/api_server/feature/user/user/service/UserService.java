@@ -1,10 +1,13 @@
 package jjk.api.api_server.feature.user.user.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
+
 import jjk.api.api_server.feature.user.user.dto.RoleDto;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.entity.QRole;
@@ -19,85 +22,82 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserService {
 
-  private final UserRepository userRepository;
-  private final ModelMapper modelMapper;
-  private final JPAQueryFactory jpaQueryFactory;
+    private final UserRepository userRepository;
+    private final ModelMapper modelMapper;
+    private final JPAQueryFactory jpaQueryFactory;
 
-  // QEntity
-  private static final QUser qUser = QUser.user;
-  private static final QRole qRole = QRole.role;
+    // QEntity
+    private static final QUser qUser = QUser.user;
+    private static final QRole qRole = QRole.role;
 
 
-  public UserService(UserRepository userRepository, ModelMapper modelMapper,
-      JPAQueryFactory jpaQueryFactory) {
-    this.userRepository = userRepository;
-    this.modelMapper = modelMapper;
-    this.jpaQueryFactory = jpaQueryFactory;
-  }
-
-  // 사용자 생성
-  public void createUser(UserDto userDto) {
-    userRepository.save(modelMapper.map(userDto, User.class));
-  }
-
-  // 모든 사용자 조회
-  public List<UserDto> getAllUsers() {
-    List<User> users = jpaQueryFactory.selectFrom(qUser).fetch();
-    return users.stream().map(user -> modelMapper.map(user, UserDto.class)).toList();
-  }
-
-  // ID로 사용자 조회
-  public Optional<UserDto> getUserById(Long id) {
-    User user = jpaQueryFactory.selectFrom(qUser).where(qUser.id.eq(id)).fetchOne();
-    return Optional.ofNullable(user).map(this::userToDto);
-  }
-
-  // 사용자 업데이트
-  @Transactional
-  public void updateUser(Long id, UserDto userDto) {
-    // 기존 사용자 확인
-    Optional<User> existingUserOpt = userRepository.findById(id);
-
-    if (existingUserOpt.isPresent()) {
-      LocalDateTime now = LocalDateTime.now();
-
-      // 업데이트된 필드 설정
-      jpaQueryFactory.update(qUser).where(qUser.id.eq(id))
-          .set(qUser.username, userDto.getUsername()).set(qUser.email, userDto.getEmail())
-          .set(qUser.updatedDate, now).execute();
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, JPAQueryFactory jpaQueryFactory) {
+        this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
+        this.jpaQueryFactory = jpaQueryFactory;
     }
-  }
 
-  // 사용자 삭제
-  @Transactional
-  public boolean deleteUser(Long id) {
-    // 삭제 쿼리 실행
-    long deletedCount = jpaQueryFactory.delete(qUser).where(qUser.id.eq(id)).execute();
-
-    // 삭제된 행이 있으면 true 반환, 없으면 false 반환
-    return deletedCount > 0;
-  }
-
-  @Transactional(readOnly = true)
-  public Optional<UserDto> findByUsername(String loginId) {
-    User user = jpaQueryFactory.selectFrom(qUser)
-        .leftJoin(qUser.roles, qRole)
-        .where(qUser.loginId.eq(loginId))
-        .fetchOne();
-
-    return Optional.ofNullable(user).map(this::userToDto);
-  }
-
-  public UserDto userToDto(User user) {
-    UserDto userDto = modelMapper.map(user, UserDto.class);
-    if (user.getRoles() != null) {
-      userDto.setRoleDto(user.getRoles().stream().map(this::roleToDto)
-          .collect(Collectors.toSet()));
+    // 사용자 생성
+    public void createUser(UserDto userDto) {
+        userRepository.save(modelMapper.map(userDto, User.class));
     }
-    return userDto;
-  }
 
-  public RoleDto roleToDto(Role role) {
-    return modelMapper.map(role, RoleDto.class);
-  }
+    // 모든 사용자 조회
+    public List<UserDto> getAllUsers() {
+        List<User> users = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin().fetch();
+        return users.stream().map(this::userToDto).toList();
+    }
+
+    // ID로 사용자 조회
+    public Optional<UserDto> getUserById(Long id) {
+        User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin().where(qUser.id.eq(id)).fetchOne();
+        return Optional.ofNullable(user).map(this::userToDto);
+    }
+
+    // 사용자 업데이트
+    @Transactional
+    public void updateUser(Long id, UserDto userDto) {
+        // 기존 사용자 확인
+        Optional<User> existingUserOpt = userRepository.findById(id);
+
+        if (existingUserOpt.isPresent()) {
+            LocalDateTime now = LocalDateTime.now();
+
+            // 업데이트된 필드 설정
+            jpaQueryFactory.update(qUser).where(qUser.id.eq(id)).set(qUser.username, userDto.getUsername()).set(qUser.email, userDto.getEmail()).set(qUser.updatedDate, now).execute();
+        }
+    }
+
+    // 사용자 삭제
+    @Transactional
+    public boolean deleteUser(Long id) {
+        // 삭제 쿼리 실행
+        long deletedCount = jpaQueryFactory.delete(qUser).where(qUser.id.eq(id)).execute();
+
+        // 삭제된 행이 있으면 true 반환, 없으면 false 반환
+        return deletedCount > 0;
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<UserDto> findByUsername(String loginId) {
+        User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).where(qUser.loginId.eq(loginId)).fetchOne();
+
+        return Optional.ofNullable(user).map(this::userToDto);
+    }
+
+    public UserDto userToDto(User user) {
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        Set<RoleDto> roleDtoSet = new HashSet<>();
+        if (user.getRoles() != null) {
+            for (Role role : user.getRoles()) {
+                roleDtoSet.add(roleToDto(role));
+            }
+        }
+        userDto.setRoleDto(roleDtoSet);
+        return userDto;
+    }
+
+    public RoleDto roleToDto(Role role) {
+        return modelMapper.map(role, RoleDto.class);
+    }
 }

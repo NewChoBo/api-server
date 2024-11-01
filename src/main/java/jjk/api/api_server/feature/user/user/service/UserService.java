@@ -1,13 +1,11 @@
 package jjk.api.api_server.feature.user.user.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import jjk.api.api_server.feature.user.user.dto.RoleDto;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.entity.QRole;
@@ -81,14 +79,6 @@ public class UserService {
 
     // 삭제된 행이 있으면 true 반환, 없으면 false 반환
     return deletedCount > 0;
-  }
-
-  @Transactional(readOnly = true)
-  public Optional<UserDto> findByUsername(String loginId) {
-    User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole)
-        .where(qUser.loginId.eq(loginId)).fetchOne();
-
-    return Optional.ofNullable(user).map(this::userToDto);
   }
 
   public UserDto userToDto(User user) {

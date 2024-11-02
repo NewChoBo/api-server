@@ -3,7 +3,7 @@ package jjk.api.api_server.common.init;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.ArrayList;
 import jjk.api.api_server.common.util.PasswordUtil;
 import jjk.api.api_server.feature.user.auth.repository.RoleRepository;
 import jjk.api.api_server.feature.user.user.entity.Role;
@@ -42,7 +42,7 @@ public class DatabaseInitializer {
         .email("abcd@efg.com")
         .createdDate(LocalDateTime.now())
         .updatedDate(LocalDateTime.now())
-        .roles(new HashSet<>())
+        .roles(new ArrayList<>())
         .build();
     userRepository.save(user1);
     User user2 = User.builder()
@@ -52,7 +52,7 @@ public class DatabaseInitializer {
         .email("abcd2@efg.com")
         .createdDate(LocalDateTime.now())
         .updatedDate(LocalDateTime.now())
-        .roles(new HashSet<>())
+        .roles(new ArrayList<>())
         .build();
     userRepository.save(user2);
     Role roleUser = Role.builder()

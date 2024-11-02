@@ -49,7 +49,6 @@ public class UserController {
 
   // 모든 사용자 조회
   @GetMapping
-  @PreAuthorize("hasRole('ROLE_USER')")
   @Operation(summary = "Get all users", description = "Retrieves a list of all users")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Successfully retrieved list", content = @Content(schema = @Schema(implementation = List.class))),

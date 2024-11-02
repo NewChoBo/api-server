@@ -1,13 +1,14 @@
 package jjk.api.api_server.feature.user.auth.service;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import jjk.api.api_server.feature.user.auth.model.CustomUserDetails;
 import jjk.api.api_server.feature.user.user.dto.RoleDto;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
-import jjk.api.api_server.feature.user.user.service.UserService;
-import org.springframework.security.core.GrantedAuthority;
+import jjk.api.api_server.feature.user.user.entity.QRole;
+import jjk.api.api_server.feature.user.user.entity.QUser;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,29 +17,46 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-  private final UserService userService;
+  private final AuthService authService;
+  private final JPAQueryFactory jpaQueryFactory;
 
-  public CustomUserDetailsService(UserService userService) {
-    this.userService = userService;
+  public CustomUserDetailsService(@Lazy AuthService authService, JPAQueryFactory jpaQueryFactory) {
+    this.authService = authService;
+    this.jpaQueryFactory = jpaQueryFactory;
   }
 
   @Override
   public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<UserDto> optionalUserDto = userService.findByUsername(username);
+    QUser qUser = QUser.user;
+    QRole qRole = QRole.role;
+    UserDto userDto = jpaQueryFactory.select(Projections.bean(UserDto.class,
+            qUser.id,
+            qUser.username,
+            qUser.loginId,
+            qUser.password,
+            qUser.email,
+            qUser.createdDate,
+            qUser.updatedDate,
+            Projections.list(Projections.bean(RoleDto.class, qRole.id, qRole.name, qRole.memo))))
+        .from(qUser)
+        .leftJoin(qUser.roles, qRole)
+        .fetchJoin()
+        .where(qUser.loginId.eq(username))
+        .fetchOne();
 
-    if (optionalUserDto.isEmpty()) {
+    System.out.println("userDto = " + userDto);
+
+    if (userDto == null) {
       throw new UsernameNotFoundException("User not found");
     }
 
-    UserDto userDto = optionalUserDto.get();
-
-    Set<GrantedAuthority> grantedAuthorities = getAuthByRoles(userDto.getRoleDto());
+    List<SimpleGrantedAuthority> grantedAuthorities = getAuthByRoles(userDto.getRoles());
     return new CustomUserDetails(userDto.getLoginId(), userDto.getPassword(), grantedAuthorities);
   }
 
-  Set<GrantedAuthority> getAuthByRoles(Set<RoleDto> roles) {
+  List<SimpleGrantedAuthority> getAuthByRoles(List<RoleDto> roles) {
     return roles.stream()
         .map(role -> new SimpleGrantedAuthority(role.getName()))
-        .collect(Collectors.toSet());
+        .toList();
   }
 }

@@ -6,8 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +27,7 @@ public class Role {
   private Long id;
 
   @ManyToMany(mappedBy = "roles")
-  private Set<User> users = new HashSet<>();
+  private List<User> users;
 
   @Column(nullable = false, unique = true)
   private String name;

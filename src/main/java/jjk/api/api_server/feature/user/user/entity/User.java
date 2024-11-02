@@ -9,8 +9,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,5 +50,5 @@ public class User {
 
   @ManyToMany
   @JoinTable
-  private Set<Role> roles = new HashSet<>();
+  private List<Role> roles;
 }

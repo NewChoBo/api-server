@@ -4,12 +4,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import jjk.api.api_server.feature.user.user.dto.RoleDto;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.entity.QRole;
 import jjk.api.api_server.feature.user.user.entity.QUser;
-import jjk.api.api_server.feature.user.user.entity.Role;
 import jjk.api.api_server.feature.user.user.entity.User;
 import jjk.api.api_server.feature.user.user.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -42,14 +39,16 @@ public class UserService {
 
   // 모든 사용자 조회
   public List<UserDto> getAllUsers() {
-    List<User> users = jpaQueryFactory.selectFrom(qUser).fetch();
-    return users.stream().map(user -> modelMapper.map(user, UserDto.class)).toList();
+    List<User> users = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin()
+        .fetch();
+    return users.stream().map(element -> modelMapper.map(element, UserDto.class)).toList();
   }
 
   // ID로 사용자 조회
   public Optional<UserDto> getUserById(Long id) {
-    User user = jpaQueryFactory.selectFrom(qUser).where(qUser.id.eq(id)).fetchOne();
-    return Optional.ofNullable(user).map(this::userToDto);
+    User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin()
+        .where(qUser.id.eq(id)).fetchOne();
+    return Optional.ofNullable(user).map(element -> modelMapper.map(element, UserDto.class));
   }
 
   // 사용자 업데이트
@@ -76,28 +75,5 @@ public class UserService {
 
     // 삭제된 행이 있으면 true 반환, 없으면 false 반환
     return deletedCount > 0;
-  }
-
-  @Transactional(readOnly = true)
-  public Optional<UserDto> findByUsername(String loginId) {
-    User user = jpaQueryFactory.selectFrom(qUser)
-        .leftJoin(qUser.roles, qRole)
-        .where(qUser.loginId.eq(loginId))
-        .fetchOne();
-
-    return Optional.ofNullable(user).map(this::userToDto);
-  }
-
-  public UserDto userToDto(User user) {
-    UserDto userDto = modelMapper.map(user, UserDto.class);
-    if (user.getRoles() != null) {
-      userDto.setRoleDto(user.getRoles().stream().map(this::roleToDto)
-          .collect(Collectors.toSet()));
-    }
-    return userDto;
-  }
-
-  public RoleDto roleToDto(Role role) {
-    return modelMapper.map(role, RoleDto.class);
   }
 }

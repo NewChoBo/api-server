@@ -35,26 +35,26 @@ public class DatabaseInitializer {
   private void initUserAndRole() {
     String encodedPassword = PasswordUtil.encodePassword("password");
 
-    User user1 = User.builder()
-        .loginId("user1")
-        .username("user name1")
+    User admin = User.builder()
+        .loginId("admin")
+        .username("관리자 이름")
         .password(encodedPassword)
         .email("abcd@efg.com")
         .createdDate(LocalDateTime.now())
         .updatedDate(LocalDateTime.now())
         .roles(new HashSet<>())
         .build();
-    userRepository.save(user1);
-    User user2 = User.builder()
-        .loginId("user2")
-        .username("user name2")
+    userRepository.save(admin);
+    User user = User.builder()
+        .loginId("user")
+        .username("일반 이용자")
         .password(encodedPassword)
         .email("abcd2@efg.com")
         .createdDate(LocalDateTime.now())
         .updatedDate(LocalDateTime.now())
         .roles(new HashSet<>())
         .build();
-    userRepository.save(user2);
+    userRepository.save(user);
     Role roleUser = Role.builder()
         .name("ROLE_USER")
         .memo("Standard user role")
@@ -67,11 +67,12 @@ public class DatabaseInitializer {
         .build();
     roleRepository.save(roleAdmin);
 
-    user1.getRoles().add(roleUser);
-    user2.getRoles().add(roleAdmin);
+    admin.getRoles().add(roleUser);
+    admin.getRoles().add(roleAdmin);
+    user.getRoles().add(roleAdmin);
 
     // 매핑 테이블을 저장
-    userRepository.save(user1);
-    userRepository.save(user2);
+    userRepository.save(admin);
+    userRepository.save(user);
   }
 }

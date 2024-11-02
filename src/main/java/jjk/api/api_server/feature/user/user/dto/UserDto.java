@@ -20,6 +20,6 @@ public class UserDto {
   private String email;
   private LocalDateTime createdDate;
   private LocalDateTime updatedDate;
-  private Set<RoleDto> roleDto;
+  private Set<RoleDto> roles;
 
 }

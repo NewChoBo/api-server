@@ -10,6 +10,11 @@ public class CustomUserDetails implements UserDetails {
   private final String password;
   private final Collection<? extends GrantedAuthority> authorities;
 
+  public CustomUserDetails(String username,
+      Collection<? extends GrantedAuthority> authorities) {
+    this(username, null, authorities);
+  }
+
   public CustomUserDetails(String username, String password,
       Collection<? extends GrantedAuthority> authorities) {
     this.username = username;

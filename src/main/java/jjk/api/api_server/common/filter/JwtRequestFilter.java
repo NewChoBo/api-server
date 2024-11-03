@@ -45,9 +45,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         List<SimpleGrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new)
             .toList();
 
+        // principal을 토큰 정보로 설정
+        Object principal = jwtUtil.extractUserInfo(jwt); // 토큰에서 사용자 정보 추출하는 메서드 추가 필요
+
         // 권한 정보를 포함한 인증 객체 생성
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-            username, null, authorities);
+            principal, null, authorities);
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         // SecurityContext에 인증 정보 설정

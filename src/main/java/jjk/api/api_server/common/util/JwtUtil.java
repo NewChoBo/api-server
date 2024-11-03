@@ -71,4 +71,18 @@ public class JwtUtil {
           .toList();
     });
   }
+
+  public CustomUserDetails extractUserInfo(String token) {
+    String username = extractUsername(token);
+    List<String> roles = extractRoles(token);
+
+    // GrantedAuthority 목록 생성
+    List<GrantedAuthority> authorities = roles.stream()
+        .map(role -> (GrantedAuthority) () -> role)
+        .toList();
+
+    // CustomUserDetails 객체 생성
+    return new CustomUserDetails(username, authorities);
+  }
+
 }

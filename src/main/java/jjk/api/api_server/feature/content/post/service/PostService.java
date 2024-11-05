@@ -47,6 +47,7 @@ public class PostService {
     postRepository.save(post);
   }
 
+  @Transactional(readOnly = true)
   public ListDto<PostDto> getPostList(SearchDto searchDto) {
     log.info(searchDto.toString());
     List<Post> posts = jpaQueryFactory.selectFrom(qPost).fetch();

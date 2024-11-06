@@ -5,11 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -49,7 +47,6 @@ public class User {
   @Column
   private LocalDateTime updatedDate;
 
-  @ManyToMany
-  @JoinTable
-  private Set<Role> roles = new HashSet<>();
+  @OneToMany(mappedBy = "user")
+  private Set<UserRole> userRoles;
 }

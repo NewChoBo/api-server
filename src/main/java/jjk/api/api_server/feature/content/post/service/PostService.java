@@ -9,6 +9,7 @@ import jjk.api.api_server.feature.content.post.dto.SearchDto;
 import jjk.api.api_server.feature.content.post.entity.Post;
 import jjk.api.api_server.feature.content.post.entity.QPost;
 import jjk.api.api_server.feature.content.post.repository.PostRepository;
+import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.entity.QUser;
 import jjk.api.api_server.feature.user.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
@@ -38,11 +39,8 @@ public class PostService {
   @Transactional
   public void createPost(PostDto postDto, String userId) {
     Post post = modelMapper.map(postDto, Post.class);
-    User user = jpaQueryFactory
-        .select(Projections.fields(User.class, qUser.id))  // 필요한 필드만 선택
-        .from(qUser)
-        .where(qUser.loginId.eq(userId))
-        .fetchFirst();
+    User user = jpaQueryFactory.select(Projections.fields(User.class, qUser.id))  // 필요한 필드만 선택
+        .from(qUser).where(qUser.loginId.eq(userId)).fetchFirst();
     post.setUser(user);
     postRepository.save(post);
   }
@@ -65,8 +63,10 @@ public class PostService {
 
   @Transactional(readOnly = true)
   public PostDto getPost(Long postId) {
-    Post post = jpaQueryFactory.selectFrom(qPost).where(qPost.id.eq(postId)).fetchOne();
-    return modelMapper.map(post, PostDto.class);
+    return jpaQueryFactory.select(
+            Projections.bean(PostDto.class, qPost.id, qPost.title, qPost.contents,
+                Projections.bean(UserDto.class, qPost.user.loginId).as("user"))).from(qPost)
+        .leftJoin(qPost.user, qUser).where(qPost.id.eq(postId)).fetchOne();
   }
 
   public void updatePost(PostDto postDto) {

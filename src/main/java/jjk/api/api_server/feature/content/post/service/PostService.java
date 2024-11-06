@@ -69,14 +69,20 @@ public class PostService {
         .leftJoin(qPost.user, qUser).where(qPost.id.eq(postId)).fetchOne();
   }
 
+  @Transactional
   public void updatePost(PostDto postDto) {
-    Post post = jpaQueryFactory.selectFrom(qPost).where(qPost.id.eq(postDto.getId())).fetchOne();
-    postRepository.save(post);
+    jpaQueryFactory.update(qPost)
+        .where(qPost.id.eq(postDto.getId()))
+        .set(qPost.title, postDto.getTitle())
+        .set(qPost.contents, postDto.getContents())
+        .execute();
   }
 
-  public void deletePost(PostDto postDto) {
-    Post post = jpaQueryFactory.selectFrom(qPost).where(qPost.id.eq(postDto.getId())).fetchOne();
-    postRepository.delete(post);
+  @Transactional
+  public void deletePost(Long postId) {
+    jpaQueryFactory.delete(qPost)
+        .where(qPost.id.eq(postId))
+        .execute();
   }
 
 }

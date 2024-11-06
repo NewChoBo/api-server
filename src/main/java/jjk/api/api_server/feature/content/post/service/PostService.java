@@ -2,6 +2,7 @@ package jjk.api.api_server.feature.content.post.service;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import jjk.api.api_server.common.dto.ListDto;
 import jjk.api.api_server.feature.content.post.dto.PostDto;
@@ -23,11 +24,11 @@ public class PostService {
 
   private final ModelMapper modelMapper;
   private final JPAQueryFactory jpaQueryFactory;
+  private final PostRepository postRepository;
 
   // QEntity
   private static final QUser qUser = QUser.user;
   private static final QPost qPost = QPost.post;
-  private final PostRepository postRepository;
 
   public PostService(ModelMapper modelMapper, JPAQueryFactory jpaQueryFactory,
       PostRepository postRepository) {
@@ -38,9 +39,8 @@ public class PostService {
 
   @Transactional
   public void createPost(PostDto postDto, String userId) {
+    User user = fetchUserByLoginId(userId);
     Post post = modelMapper.map(postDto, Post.class);
-    User user = jpaQueryFactory.select(Projections.fields(User.class, qUser.id))  // 필요한 필드만 선택
-        .from(qUser).where(qUser.loginId.eq(userId)).fetchFirst();
     post.setUser(user);
     postRepository.save(post);
   }
@@ -71,18 +71,30 @@ public class PostService {
 
   @Transactional
   public void updatePost(PostDto postDto) {
-    jpaQueryFactory.update(qPost)
-        .where(qPost.id.eq(postDto.getId()))
-        .set(qPost.title, postDto.getTitle())
-        .set(qPost.contents, postDto.getContents())
-        .execute();
+    Post post = postRepository.findById(postDto.getId())
+        .orElseThrow(
+            () -> new EntityNotFoundException("Post not found with id: " + postDto.getId()));
+    post.setTitle(postDto.getTitle());
+    post.setContents(postDto.getContents());
+    postRepository.save(post);
   }
 
   @Transactional
   public void deletePost(Long postId) {
-    jpaQueryFactory.delete(qPost)
-        .where(qPost.id.eq(postId))
-        .execute();
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
+    postRepository.delete(post);
   }
 
+  private User fetchUserByLoginId(String userId) {
+    User user = jpaQueryFactory.select(Projections.fields(User.class, qUser.id))
+        .from(qUser)
+        .where(qUser.loginId.eq(userId))
+        .fetchFirst();
+
+    if (user == null) {
+      throw new EntityNotFoundException("User not found with loginId: " + userId);
+    }
+    return user;
+  }
 }

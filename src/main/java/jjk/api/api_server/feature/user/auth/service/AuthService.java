@@ -82,10 +82,9 @@ public class AuthService {
   }
 
   public ResponseEntity<String> signOut() {
-    // TODO: token 만료 처리 필요
+    // TODO: token expiration handling needed
     return ResponseEntity.ok("Signed out successfully");
   }
-
 
   @Transactional(readOnly = true)
   public Optional<UserDto> findByUsername(String loginId) {

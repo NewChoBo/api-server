@@ -64,12 +64,14 @@ public class PostController {
   @PutMapping
   @Operation(summary = "Update Post", description = "Post 수정")
   public ResponseEntity<String> updatePost(@RequestBody PostDto postDto) {
+    postService.updatePost(postDto);
     return new ResponseEntity<>("수정 성공", HttpStatus.OK);
   }
 
-  @DeleteMapping
+  @DeleteMapping("/{postId}")
   @Operation(summary = "Delete Post", description = "Post 삭제")
-  public ResponseEntity<String> deletePost(@RequestBody PostDto postDto) {
+  public ResponseEntity<String> deletePost(@PathVariable Long postId) {
+    postService.deletePost(postId);
     return new ResponseEntity<>("삭제 성공", HttpStatus.OK);
   }
 }

@@ -63,6 +63,7 @@ public class PostService {
         .build();
   }
 
+  @Transactional(readOnly = true)
   public PostDto getPost(Long postId) {
     Post post = jpaQueryFactory.selectFrom(qPost).where(qPost.id.eq(postId)).fetchOne();
     return modelMapper.map(post, PostDto.class);

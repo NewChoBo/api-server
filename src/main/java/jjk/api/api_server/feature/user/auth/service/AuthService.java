@@ -2,12 +2,10 @@ package jjk.api.api_server.feature.user.auth.service;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import jjk.api.api_server.common.util.JwtUtil;
 import jjk.api.api_server.feature.user.auth.dto.SignInDto;
 import jjk.api.api_server.feature.user.auth.dto.SignUpDto;
 import jjk.api.api_server.feature.user.auth.model.CustomUserDetails;
-import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.entity.QRole;
 import jjk.api.api_server.feature.user.user.entity.QUser;
 import jjk.api.api_server.feature.user.user.entity.User;
@@ -82,15 +80,7 @@ public class AuthService {
   }
 
   public ResponseEntity<String> signOut() {
-    // TODO: token 만료 처리 필요
+    // TODO: token expiration handling needed
     return ResponseEntity.ok("Signed out successfully");
-  }
-
-
-  @Transactional(readOnly = true)
-  public Optional<UserDto> findByUsername(String loginId) {
-    User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole)
-        .where(qUser.loginId.eq(loginId)).fetchOne();
-    return Optional.ofNullable(user).map(element -> modelMapper.map(element, UserDto.class));
   }
 }

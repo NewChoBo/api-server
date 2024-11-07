@@ -6,7 +6,9 @@ import java.util.stream.Collectors;
 import jjk.api.api_server.feature.user.auth.model.CustomUserDetails;
 import jjk.api.api_server.feature.user.user.dto.RoleDto;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
-import org.springframework.context.annotation.Lazy;
+import jjk.api.api_server.feature.user.user.entity.User;
+import jjk.api.api_server.feature.user.user.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -16,21 +18,21 @@ import org.springframework.stereotype.Service;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-  private final AuthService authService;
 
-  public CustomUserDetailsService(@Lazy AuthService authService) {
-    this.authService = authService;
+  private final UserRepository userRepository;
+  private final ModelMapper modelMapper;
+
+  public CustomUserDetailsService(UserRepository userRepository, ModelMapper modelMapper) {
+    this.userRepository = userRepository;
+    this.modelMapper = modelMapper;
   }
 
   @Override
-  public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    Optional<UserDto> optionalUserDto = authService.findByUsername(username);
-
-    if (optionalUserDto.isEmpty()) {
-      throw new UsernameNotFoundException("User not found");
-    }
-
-    UserDto userDto = optionalUserDto.get();
+  public CustomUserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
+    Optional<User> optionalUser = userRepository.findByLoginId(loginId);
+    UserDto userDto = modelMapper.map(
+        optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found")),
+        UserDto.class);
 
     Set<GrantedAuthority> grantedAuthorities = getAuthByRoles(userDto.getRoles());
     return new CustomUserDetails(userDto.getLoginId(), userDto.getPassword(), grantedAuthorities);

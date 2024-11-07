@@ -1,12 +1,15 @@
-package jjk.api.api_server.feature.user.user.entity;
+package jjk.api.api_server.feature.content.post.entity;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.Set;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
+import jjk.api.api_server.feature.user.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,19 +22,20 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role {
+public class Post {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  @Column(nullable = false)
   private Long id;
 
-  @OneToMany(mappedBy = "role")
-  private Set<UserRole> userRoles;
+  @ManyToOne
+  private User user;
 
-  @Column(nullable = false, unique = true)
-  private String name;
+  @Column(nullable = false)
+  String title;
 
-  @Column
-  private String memo;
+  @Lob
+  @Basic(fetch = FetchType.LAZY)
+  private String contents;
+
 }

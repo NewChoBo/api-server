@@ -1,3 +1,4 @@
+// Role.java
 package jjk.api.api_server.feature.user.user.entity;
 
 import jakarta.persistence.Column;
@@ -6,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,12 +27,12 @@ public class Role {
   @Column(nullable = false)
   private Long id;
 
-  @ManyToMany(mappedBy = "roles")
-  private Set<User> users = new HashSet<>();
-
   @Column(nullable = false, unique = true)
   private String name;
 
   @Column
   private String memo;
+
+  @ManyToMany(mappedBy = "role")
+  private Set<User> user;
 }

@@ -5,9 +5,9 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import jjk.api.api_server.common.util.PasswordUtil;
-import jjk.api.api_server.feature.user.auth.repository.RoleRepository;
 import jjk.api.api_server.feature.user.user.entity.Role;
 import jjk.api.api_server.feature.user.user.entity.User;
+import jjk.api.api_server.feature.user.user.repository.RoleRepository;
 import jjk.api.api_server.feature.user.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class DatabaseInitializer {
         .email("abcd@efg.com")
         .createdDate(LocalDateTime.now())
         .updatedDate(LocalDateTime.now())
-        .roles(new HashSet<>())
+        .role(new HashSet<>())
         .build();
     userRepository.save(admin);
     User user = User.builder()
@@ -52,7 +52,7 @@ public class DatabaseInitializer {
         .email("abcd2@efg.com")
         .createdDate(LocalDateTime.now())
         .updatedDate(LocalDateTime.now())
-        .roles(new HashSet<>())
+        .role(new HashSet<>())
         .build();
     userRepository.save(user);
     Role roleUser = Role.builder()
@@ -67,9 +67,9 @@ public class DatabaseInitializer {
         .build();
     roleRepository.save(roleAdmin);
 
-    admin.getRoles().add(roleUser);
-    admin.getRoles().add(roleAdmin);
-    user.getRoles().add(roleAdmin);
+    admin.getRole().add(roleUser);
+    admin.getRole().add(roleAdmin);
+    user.getRole().add(roleAdmin);
 
     // 매핑 테이블을 저장
     userRepository.save(admin);

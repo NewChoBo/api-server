@@ -39,14 +39,14 @@ public class UserService {
 
   // 모든 사용자 조회
   public List<UserDto> getAllUsers() {
-    List<User> users = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin()
+    List<User> users = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.role, qRole).fetchJoin()
         .fetch();
     return users.stream().map(element -> modelMapper.map(element, UserDto.class)).toList();
   }
 
   // ID로 사용자 조회
   public Optional<UserDto> getUserById(Long id) {
-    User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.roles, qRole).fetchJoin()
+    User user = jpaQueryFactory.selectFrom(qUser).leftJoin(qUser.role, qRole).fetchJoin()
         .where(qUser.id.eq(id)).fetchOne();
     return Optional.ofNullable(user).map(element -> modelMapper.map(element, UserDto.class));
   }

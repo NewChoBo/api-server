@@ -34,7 +34,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found")),
         UserDto.class);
 
-    Set<GrantedAuthority> grantedAuthorities = getAuthByRoles(userDto.getRoles());
+    Set<GrantedAuthority> grantedAuthorities = getAuthByRoles(userDto.getRole());
     return new CustomUserDetails(userDto.getLoginId(), userDto.getPassword(), grantedAuthorities);
   }
 

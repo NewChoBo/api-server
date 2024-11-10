@@ -26,16 +26,16 @@ public class JwtUtil {
     return Keys.hmacShaKeyFor(secret.getBytes());
   }
 
+  private Long getSubject(String token) {
+    return Long.valueOf(extractClaim(token, Claims::getSubject));
+  }
+
   public String generateToken(CustomUserDetails user) {
     return Jwts.builder().setSubject(String.valueOf(user.getId()))
-        .claim("userId", user.getUsername())
+        .claim("username", user.getUsername())
         .claim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
         .setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + expiration))
         .signWith(getSigningKey(), SignatureAlgorithm.HS512).compact();
-  }
-
-  public String extractUsername(String token) {
-    return extractClaim(token, Claims::getSubject);
   }
 
   public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -74,7 +74,8 @@ public class JwtUtil {
   }
 
   public CustomUserDetails extractUserInfo(String token) {
-    String username = extractUsername(token);
+    long id = getSubject(token);
+    String username = extractClaim(token, Claims::getSubject);
     List<String> roles = extractRoles(token);
 
     // GrantedAuthority 목록 생성
@@ -83,7 +84,7 @@ public class JwtUtil {
         .toList();
 
     // CustomUserDetails 객체 생성
-    return new CustomUserDetails(username, authorities);
+    return new CustomUserDetails(id, username, authorities);
   }
 
 }

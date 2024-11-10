@@ -35,7 +35,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         UserDto.class);
 
     Set<GrantedAuthority> grantedAuthorities = getAuthByRoles(userDto.getRole());
-    return new CustomUserDetails(userDto.getLoginId(), userDto.getPassword(), grantedAuthorities);
+    return new CustomUserDetails(userDto.getId(), userDto.getLoginId(), userDto.getPassword(),
+        grantedAuthorities);
   }
 
   Set<GrantedAuthority> getAuthByRoles(Set<RoleDto> roles) {

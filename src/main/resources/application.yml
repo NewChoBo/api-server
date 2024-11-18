@@ -14,10 +14,10 @@ spring:
 
   # DB 설정
   datasource:
-    url: jdbc:postgresql://<host>:<port>/<database_name> # PostgreSQL 연결 URL
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?currentSchema=${DB_SCHEMA} # PostgreSQL 연결 URL
     driver-class-name: org.postgresql.Driver
-    username: <username> # PostgreSQL 사용자 이름
-    password: <password> # PostgreSQL 비밀번호
+    username: ${DB_USER} # PostgreSQL 사용자 이름
+    password: ${DB_PASSWORD} # PostgreSQL 비밀번호
   jpa:
     hibernate:
       ddl-auto: update # 엔티티 변경 시 자동으로 테이블을 업데이트합니다.
@@ -36,5 +36,5 @@ spring:
 
 
 jwt:
-  secret: your_jwt_secret_key
-  expiration: 3600000
+  secret: ${JWT_SECRET} # JWT 암호화 키
+  expiration: ${JWT_EXPIRATION} # JWT 토큰 만료 시간 (밀리초)

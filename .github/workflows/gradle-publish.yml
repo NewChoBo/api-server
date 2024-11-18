@@ -12,6 +12,14 @@ jobs:
     permissions:
       contents: read
       packages: write
+    env: # 워크플로 전체에서 사용할 환경 변수
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
 
     steps:
       - uses: actions/checkout@v4

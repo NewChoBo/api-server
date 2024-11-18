@@ -6,11 +6,11 @@ import jjk.api.api_server.common.dto.ListDto;
 import jjk.api.api_server.feature.content.post.dto.PostDto;
 import jjk.api.api_server.feature.content.post.dto.SearchDto;
 import jjk.api.api_server.feature.content.post.service.PostService;
+import jjk.api.api_server.feature.user.auth.model.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,14 +36,13 @@ public class PostController {
   public ResponseEntity<String> createPost(@RequestBody PostDto postDto) {
     // JWT 토큰에서 인증된 사용자 정보 가져오기
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String userId = null;
 
     if (authentication.getPrincipal() != null) {
-      UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-      userId = userDetails.getUsername();  // UserDetails에 저장된 ID 가져오기
+      CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+      long userId = userDetails.getId();  // UserDetails에 저장된 ID 가져오기
+      postService.createPost(postDto, userId);
     }
 
-    postService.createPost(postDto, userId);
     return new ResponseEntity<>("삽입 성공", HttpStatus.OK);
   }
 

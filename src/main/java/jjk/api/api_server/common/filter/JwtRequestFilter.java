@@ -38,7 +38,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
       if (jwtUtil.validateToken(jwt)) {
         // 토큰에서 사용자 이름 및 권한 정보 가져오기
-        String username = jwtUtil.extractUsername(jwt); // 사용자 이름 추출
         List<String> roles = jwtUtil.extractRoles(jwt); // 권한 추출
 
         // 권한 정보를 포함한 인증 객체 생성
@@ -53,9 +52,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             principal, null, authorities);
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-        // SecurityContext에 인증 정보 설정
-        log.info("User '{}' authenticated", username);
-        log.info("role: {}", roles);
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
       }
     } else {

@@ -13,6 +13,7 @@ import jjk.api.api_server.feature.content.post.repository.PostRepository;
 import jjk.api.api_server.feature.user.user.dto.UserDto;
 import jjk.api.api_server.feature.user.user.entity.QUser;
 import jjk.api.api_server.feature.user.user.entity.User;
+import jjk.api.api_server.feature.user.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -29,17 +30,20 @@ public class PostService {
   // QEntity
   private static final QUser qUser = QUser.user;
   private static final QPost qPost = QPost.post;
+  private final UserRepository userRepository;
 
   public PostService(ModelMapper modelMapper, JPAQueryFactory jpaQueryFactory,
-      PostRepository postRepository) {
+      PostRepository postRepository, UserRepository userRepository) {
     this.modelMapper = modelMapper;
     this.jpaQueryFactory = jpaQueryFactory;
     this.postRepository = postRepository;
+    this.userRepository = userRepository;
   }
 
   @Transactional
-  public void createPost(PostDto postDto, String userId) {
-    User user = fetchUserByLoginId(userId);
+  public void createPost(PostDto postDto, long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
     Post post = modelMapper.map(postDto, Post.class);
     post.setUser(user);
     postRepository.save(post);
@@ -85,16 +89,5 @@ public class PostService {
         .orElseThrow(() -> new EntityNotFoundException("Post not found with id: " + postId));
     postRepository.delete(post);
   }
-
-  private User fetchUserByLoginId(String userId) {
-    User user = jpaQueryFactory.select(Projections.fields(User.class, qUser.id))
-        .from(qUser)
-        .where(qUser.loginId.eq(userId))
-        .fetchFirst();
-
-    if (user == null) {
-      throw new EntityNotFoundException("User not found with loginId: " + userId);
-    }
-    return user;
-  }
+  
 }

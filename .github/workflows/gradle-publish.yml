@@ -2,11 +2,7 @@ name: Gradle Package
 
 on:
   push:
-    branches:
-      - main # main 브랜치로 커밋 또는 병합될 때 실행
   pull_request:
-    branches:
-      - main # main 브랜치로의 PR 생성 또는 업데이트 시 실행
   release:
     types: [ created ] # 릴리스 생성 시 실행
 
@@ -30,7 +26,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Cache Gradle dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}

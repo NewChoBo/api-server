@@ -1,25 +1,16 @@
-name: Release on Merge
+name: Pull Request Test
 
 on:
+  pull_request:
+    branches:
+      - '**' # 모든 브랜치에 대해 실행
   push:
     branches:
-      - main
+      - '**' # 모든 브랜치에 대해 실행
 
 jobs:
-  release:
+  test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-    env:
-      DB_HOST: ${{ secrets.DB_HOST }}
-      DB_PORT: ${{ secrets.DB_PORT }}
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_SCHEMA: ${{ secrets.DB_TEST_SCHEMA }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
 
     steps:
       - uses: actions/checkout@v4
@@ -46,9 +37,3 @@ jobs:
 
       - name: Run Tests
         run: ./gradlew test
-
-      - name: Publish to GitHub Packages
-        run: ./gradlew publish
-        env:
-          USERNAME: ${{ github.actor }}
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}

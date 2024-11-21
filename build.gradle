@@ -1,68 +1,87 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.3.5'
-    id 'io.spring.dependency-management' version '1.1.6'
+  id 'java'
+  id 'org.springframework.boot' version '3.3.5'
+  id 'io.spring.dependency-management' version '1.1.6'
+  id 'maven-publish' // Add this line
 }
 
 group = 'jjk.api'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
-    }
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(21)
+  }
 }
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
 }
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-    // Spring Boot Starters
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+  // Spring Boot Starters
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-security'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // JWT
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
-    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
-    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+  // JWT
+  implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+  implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+  implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 
-    // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+  // Lombok
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
 
-    // Development Tools
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+  // Development Tools
+  developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-    // Database
-    runtimeOnly 'org.postgresql:postgresql'
+  // Database
+  runtimeOnly 'org.postgresql:postgresql'
 
-    // Testing
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+  // Testing
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.security:spring-security-test'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Swagger
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+  // Swagger
+  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
-    // Model Mapper
-    implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
+  // Model Mapper
+  implementation group: 'org.modelmapper', name: 'modelmapper', version: '2.3.8'
 
-    // QueryDSL for Spring Boot 3.x
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+  // QueryDSL for Spring Boot 3.x
+  implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+  annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+  annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+  annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+    }
+  }
+  repositories {
+    maven {
+      name = "GitHubPackages"
+      url = uri("https://maven.pkg.github.com/NewChoBo/api-server")
+      credentials {
+        username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+        password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
+      }
+    }
+  }
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+  useJUnitPlatform()
 }

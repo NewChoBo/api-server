@@ -1,18 +1,17 @@
-name: Gradle Package
+name: Release on Merge
 
 on:
   push:
-  pull_request:
-  release:
-    types: [ created ] # 릴리스 생성 시 실행
+    branches:
+      - main
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-    env: # 워크플로 전체에서 사용할 환경 변수
+    env:
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_PORT: ${{ secrets.DB_PORT }}
       DB_NAME: ${{ secrets.DB_NAME }}

@@ -1,7 +1,7 @@
 name: Release on Merge
 
 on:
-  push:
+  pull_request_target:
     branches:
       - main
 
@@ -23,6 +23,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
